@@ -1726,15 +1726,13 @@ ZEND_DLEXPORT void hp_execute_internal(zend_execute_data *execute_data,
         fci->object_ptr,
         1 TSRMLS_CC);
     } else {
-      zval **return_value_ptr = &EX_TMP_VAR(execute_data, execute_data->opline->result.var)->var.ptr;
-      ((zend_internal_function *) execute_data->function_state.function)->handler(
-        execute_data->opline->extended_value,
-        *return_value_ptr,
-        (execute_data->function_state.function->common.fn_flags & ZEND_ACC_RETURN_REFERENCE)
-          ? return_value_ptr
-          : NULL,
-        execute_data->object,
-        ret TSRMLS_CC);
+      zend_op *opline = EX(opline);
+      ((zend_internal_function *) EX(function_state).function)->handler(
+                         opline->extended_value,
+                         EX_T(opline->result.u.var).var.ptr,
+                         EX(function_state).function->common.return_reference ?
+                         &EX_T(opline->result.u.var).var.ptr:NULL,
+                         EX(object), ret TSRMLS_CC);
     }
 #elif ZEND_EXTENSION_API_NO >= 220100525
     zend_op *opline = EX(opline);
