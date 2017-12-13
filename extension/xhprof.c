@@ -968,7 +968,10 @@ static char *hp_get_function_name(zend_op_array *ops TSRMLS_DC) {
        */
 #if ZEND_EXTENSION_API_NO >= 220121212
       if (data->prev_execute_data) {
-        curr_op = data->prev_execute_data->opline->extended_value;
+        if (data->prev_execute_data->opline)
+        {
+          curr_op = data->prev_execute_data->opline->extended_value;
+        }
       } else {
         curr_op = data->opline->extended_value;
       }
@@ -1726,14 +1729,6 @@ ZEND_DLEXPORT void hp_execute_internal(zend_execute_data *execute_data,
         fci->object_ptr,
         1 TSRMLS_CC);
     } else {
-      if (!execute_data->opline)
-      {
-        return;
-      }
-      if (!execute_data->opline->extended_value)
-      {
-        return;
-      }
       zval **return_value_ptr = &EX_TMP_VAR(execute_data, execute_data->opline->result.var)->var.ptr;
       ((zend_internal_function *) execute_data->function_state.function)->handler(
         execute_data->opline->extended_value,
